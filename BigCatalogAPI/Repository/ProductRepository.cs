@@ -1,6 +1,7 @@
 ﻿using BigCatalogAPI.Context;
 using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -41,10 +42,12 @@ namespace BigCatalogAPI.Repository
             return product;
         }
 
-        public void DeleteProduct(Product product)
+        public Product DeleteProduct(int id)
         {
+            var product = _context.Products.FirstOrDefault(c => c.ProductId == id);
             _context.Products.Remove(product);
             _context.SaveChanges();
+            return (product);
         }
 
     }

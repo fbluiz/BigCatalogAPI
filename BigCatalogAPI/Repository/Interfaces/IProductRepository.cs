@@ -8,7 +8,7 @@ namespace BigCatalogAPI.Repository.Interfaces
         Task<Product> ProductById(int id);
         Task<Product> AddProduct (Product product);
         Task<Product> UpdateProduct(Product product);
-        void DeleteProduct(Product product);
+        Product DeleteProduct(int id);
 
     }
 }
