@@ -17,45 +17,10 @@ namespace BigCatalogAPI.Controllers
             _productRepository = productRepository;
         }
 
-        [HttpGet("/products")]
-        public async Task<ActionResult<List<Product>>> Get()
+        [HttpGet]
+        public ActionResult<IEnumerable<Product>> GetProducts()
         {
-            var products = await _productRepository.GetAllProducts();
-            return Ok(products);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetById(int id)
-        {
-            var product = await _productRepository.ProductById(id);
-            if (product is null)
-            {
-                return NotFound("Product Invalid!");
-            }
-            return Ok(product);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Product>> NewProduct([FromBody] Product product)
-        {
-            var newProduct = await _productRepository.AddProduct(product);
-
-            return Ok(newProduct);
-        }
-
-        [HttpPut]
-        public async Task<ActionResult<Product>> UpdateProduct([FromBody] Product product)
-        {
-            var newProduct = await _productRepository.UpdateProduct(product);
-
-            return Ok(newProduct);
-        }
-
-        [HttpDelete("{id}")]
-        public ActionResult<Product> DeleteProduct (int id)
-        {
-            var product = _productRepository.DeleteProduct(id);
-            return (product);
+            return _productRepository.Get().ToList();
         }
 
     }

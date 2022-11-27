@@ -37,6 +37,7 @@ public partial class NorthwindContext : DbContext
             entity.Property(e => e.Picture).HasColumnType("image");
         });
 
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasIndex(e => e.CategoryId, "CategoriesProducts");
