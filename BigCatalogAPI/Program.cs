@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddDbContext<NorthwindContext>(options => options.UseSqlServer
     ("Server=DESKTOP-332I3M0\\SQLEXPRESS;Database=Northwind;Encrypt=False; Trusted_Connection=True;"));
 builder.Services.AddControllers();
