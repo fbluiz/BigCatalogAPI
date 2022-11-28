@@ -1,11 +1,6 @@
-﻿using APICatalogo.Repository;
-using BigCatalogAPI.Context;
-using BigCatalogAPI.Models;
+﻿using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 namespace BigCatalogAPI.Controllers
 {
     [Route("[controller]")]
