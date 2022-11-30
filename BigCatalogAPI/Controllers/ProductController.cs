@@ -1,4 +1,6 @@
-﻿using BigCatalogAPI.Models;
+﻿using AutoMapper;
+using BigCatalogAPI.DTOs;
+using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,70 +11,81 @@ namespace BigCatalogAPI.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork uof, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = uof;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        public ActionResult<IEnumerable<ProductDTO>> GetProducts()
         {
             var products = _unitOfWork._productRepository.Get().ToList();
-
-            if (products == null)
-            {
-                return NotFound("Product not found");
-            }
-            return products;
+            
+            var productsDto = _mapper.Map<List<ProductDTO>>(products);
+            return productsDto;
         }
 
         [HttpGet("lowprice")]
-        public ActionResult<IEnumerable<Product>> GetProductsByPrice() 
+        public ActionResult<IEnumerable<ProductDTO>> GetProductsByPrice() 
         {
-            return _unitOfWork._productRepository.GetProductForPrice().ToList();
+            var productsForPrice = _unitOfWork._productRepository.GetProductForPrice().ToList();
+            var productsDto = _mapper.Map<List<ProductDTO>>(productsForPrice);
+
+            return productsDto;
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
-        public ActionResult<Product> Get(int id)
+        public ActionResult<ProductDTO> Get(int id)
         {
-            var produto = _unitOfWork._productRepository.GetById(p => p.ProductId == id);
-            if (produto is null)
+            var product = _unitOfWork._productRepository.GetById(p => p.ProductId == id);
+            
+            if (product == null)
             {
                 return NotFound("Product not found");
             }
-            return produto;
+            
+            var productDto = _mapper.Map<ProductDTO>(product);
+            return productDto;
         }
 
         [HttpPost]
-        public ActionResult Post(Product product)
+        public ActionResult Post([FromBody] ProductDTO productDto)
         {
-            if (product is null)
+            if (productDto is null)
                 return BadRequest();
 
+            var product = _mapper.Map<Product>(productDto);
+            
             _unitOfWork._productRepository.Add(product);
             _unitOfWork.Commit();
 
+            var productDTO = _mapper.Map<ProductDTO>(product);
             return new CreatedAtRouteResult("GetProductById",
-                new { id = product.ProductId }, product);
+                new { id = product.ProductId }, productDTO);
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Product product)
+        public ActionResult<ProductDTO> Put(int id, [FromBody] ProductDTO productDTO)
         {
-            if (id != product.ProductId)
+            if (id != productDTO.ProductId)
             {
                 return BadRequest();
             }
+
+            var product = _mapper.Map<Product>(productDTO);
 
             _unitOfWork._productRepository.Update(product);
             _unitOfWork.Commit();
 
-            return Ok(product);
+            var productDto = _mapper.Map<ProductDTO>(product);
+            return Ok(productDto);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<ProductDTO> Delete(int id)
         {
             var product = _unitOfWork._productRepository.GetById(p => p.ProductId == id);
             
@@ -83,7 +96,9 @@ namespace BigCatalogAPI.Controllers
             _unitOfWork._productRepository.Delete(product);
             _unitOfWork.Commit();
 
-            return Ok(product);
+            var productDto = _mapper.Map<ProductDTO>(product);
+
+            return Ok(productDto);
         }
 
     }

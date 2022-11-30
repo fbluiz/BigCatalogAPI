@@ -281,3 +281,5 @@ C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\Microso
 C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\Microsoft.SqlServer.Server.dll
 C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\System.Memory.Data.dll
+C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\brson\source\repos\BigCatalogAPI\BigCatalogAPI\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

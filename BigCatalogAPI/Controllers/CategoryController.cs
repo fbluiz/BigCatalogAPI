@@ -1,4 +1,6 @@
-﻿using BigCatalogAPI.Models;
+﻿using AutoMapper;
+using BigCatalogAPI.DTOs;
+using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 namespace BigCatalogAPI.Controllers
@@ -8,17 +10,22 @@ namespace BigCatalogAPI.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
 
-        public CategoryController(IUnitOfWork uof)
+        public CategoryController(IUnitOfWork uof, IMapper mapper)
         {
             _uof = uof;
+            _mapper = mapper;
         }
         [HttpGet("products")]
-        public ActionResult<IEnumerable<Category>> GetCategoriesProducts()
+        public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesProducts()
         {
             try
             {
-                return _uof._categoryRepository.GetCategoryAndProduct().ToList();
+                var categories = _uof._categoryRepository.GetCategoryAndProduct().ToList();
+                
+                var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
+                return categoriesDto;
             }
             catch (Exception)
             {
@@ -28,12 +35,14 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> Get() 
+        public ActionResult<IEnumerable<CategoryDTO>> Get() 
         {
             try
             {
                 var categories = _uof._categoryRepository.Get().ToList();
-                return categories;
+
+                var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
+                return categoriesDto;
             }
             catch 
             {
@@ -43,17 +52,19 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public ActionResult<Category> Get(int id)
+        public ActionResult<CategoryDTO> Get(int id)
         {
             try
             {
                 var category = _uof._categoryRepository.GetById(p => p.CategoryId == id);
+
+                var categoryDto = _mapper.Map<CategoryDTO>(category);
                 
                 if (category == null)
                 {
                     return NotFound("category not found");
                 }
-                return Ok(category);
+                return Ok(categoryDto);
             }
             catch
             {
@@ -63,18 +74,20 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(Category category)
+        public ActionResult Post([FromBody] CategoryDTO categoryDto)
         {
             try
             {
-                if (category is null)
+                if (categoryDto is null)
                     return BadRequest("Invalid form for category");
 
+                var category = _mapper.Map<Category>(categoryDto);
                 _uof._categoryRepository.Add(category);
                 _uof.Commit();
 
+                var categoryDTo = _mapper.Map<CategoryDTO>(category);
                 return new CreatedAtRouteResult("GetCategory",
-                    new { id = category.CategoryId }, category);
+                    new { id = category.CategoryId }, categoryDTo);
             }
             catch (Exception)
             {
@@ -84,17 +97,22 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Category category)
+        public ActionResult Put(int id, [FromBody] CategoryDTO categoryDto)
         {
             try
             {
-                if (id != category.CategoryId)
+                if (id != categoryDto.CategoryId)
                 {
                     return BadRequest("invalid data");
                 }
+
+                var category = _mapper.Map<Category>(categoryDto);
+
                 _uof._categoryRepository.Update(category);
                 _uof.Commit();
-                return Ok(category);
+
+                var categoryDTo = _mapper.Map<CategoryDTO>(category);
+                return Ok(categoryDTo);
             }
             catch (Exception)
             {
@@ -104,7 +122,7 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<ProductDTO> Delete(int id)
         {
             try
             {
@@ -116,7 +134,9 @@ namespace BigCatalogAPI.Controllers
                 }
                 _uof._categoryRepository.Delete(category);
                 _uof.Commit();
-                return Ok(category);
+
+                var categoryDto = _mapper.Map<CategoryDTO>(category);
+                return Ok(categoryDto);
             }
             catch (Exception)
             {
