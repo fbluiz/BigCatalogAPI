@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BigCatalogAPI.DTOs;
 using BigCatalogAPI.Models;
+using BigCatalogAPI.Pagination;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +21,9 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ProductDTO>> GetProducts()
+        public ActionResult<IEnumerable<ProductDTO>> GetProducts([FromQuery] ProductsParameters productsParameters)
         {
-            var products = _unitOfWork._productRepository.Get().ToList();
+            var products = _unitOfWork._productRepository.GetProducts(productsParameters).ToList();
             
             var productsDto = _mapper.Map<List<ProductDTO>>(products);
             return productsDto;

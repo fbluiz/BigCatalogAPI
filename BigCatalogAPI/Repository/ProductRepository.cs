@@ -1,6 +1,7 @@
 ﻿using APICatalogo.Repository;
 using BigCatalogAPI.Context;
 using BigCatalogAPI.Models;
+using BigCatalogAPI.Pagination;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,15 @@ namespace BigCatalogAPI.Repository
         public IEnumerable<Product> GetProductForPrice()
         {
             return Get().OrderBy(c=>c.UnitPrice).ToList();
+        }
+
+        public IEnumerable<Product> GetProducts(ProductsParameters productParameters)
+        {
+            return Get()
+                .OrderBy(c => c.ProductId)
+                .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+                .Take(productParameters.PageSize)
+                .ToList();
         }
     }
 }
