@@ -3,6 +3,8 @@ using BigCatalogAPI.DTOs;
 using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 namespace BigCatalogAPI.Controllers
 {
     [Route("[controller]")]
@@ -17,12 +19,13 @@ namespace BigCatalogAPI.Controllers
             _uof = uof;
             _mapper = mapper;
         }
+        
         [HttpGet("products")]
-        public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesProducts()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategoriesProducts()
         {
             try
             {
-                var categories = _uof._categoryRepository.GetCategoryAndProduct().ToList();
+                var categories = await _uof._categoryRepository.GetCategoryAndProduct();
                 
                 var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
                 return categoriesDto;
@@ -35,11 +38,11 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CategoryDTO>> Get() 
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get() 
         {
             try
             {
-                var categories = _uof._categoryRepository.Get().ToList();
+                var categories = await _uof._categoryRepository.Get().ToListAsync();
 
                 var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
                 return categoriesDto;
@@ -52,11 +55,11 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public ActionResult<CategoryDTO> Get(int id)
+        public async Task<ActionResult<CategoryDTO>> Get(int id)
         {
             try
             {
-                var category = _uof._categoryRepository.GetById(p => p.CategoryId == id);
+                var category = await _uof._categoryRepository.GetById(p => p.CategoryId == id);
 
                 var categoryDto = _mapper.Map<CategoryDTO>(category);
                 
@@ -74,7 +77,7 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] CategoryDTO categoryDto)
+        public async Task<ActionResult> Post([FromBody] CategoryDTO categoryDto)
         {
             try
             {
@@ -83,7 +86,7 @@ namespace BigCatalogAPI.Controllers
 
                 var category = _mapper.Map<Category>(categoryDto);
                 _uof._categoryRepository.Add(category);
-                _uof.Commit();
+                await _uof.Commit();
 
                 var categoryDTo = _mapper.Map<CategoryDTO>(category);
                 return new CreatedAtRouteResult("GetCategory",
@@ -97,7 +100,7 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, [FromBody] CategoryDTO categoryDto)
+        public async Task<ActionResult> Put(int id, [FromBody] CategoryDTO categoryDto)
         {
             try
             {
@@ -109,7 +112,7 @@ namespace BigCatalogAPI.Controllers
                 var category = _mapper.Map<Category>(categoryDto);
 
                 _uof._categoryRepository.Update(category);
-                _uof.Commit();
+                await _uof.Commit();
 
                 var categoryDTo = _mapper.Map<CategoryDTO>(category);
                 return Ok(categoryDTo);
@@ -122,18 +125,18 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult<ProductDTO> Delete(int id)
+        public async Task<ActionResult<ProductDTO>> Delete(int id)
         {
             try
             {
-                var category = _uof._categoryRepository.GetById(p => p.CategoryId == id);
+                var category = await _uof._categoryRepository.GetById(p => p.CategoryId == id);
 
                 if (category == null)
                 {
                     return NotFound("category not found");
                 }
                 _uof._categoryRepository.Delete(category);
-                _uof.Commit();
+                await _uof.Commit();
 
                 var categoryDto = _mapper.Map<CategoryDTO>(category);
                 return Ok(categoryDto);

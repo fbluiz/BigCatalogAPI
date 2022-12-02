@@ -6,8 +6,8 @@ namespace BigCatalogAPI.Repository.Interfaces
 {
     public interface IProductRepository : IRepository<Product>
     {
-        IEnumerable<Product> GetProductForPrice();
+        Task<IEnumerable<Product>> GetProductForPrice();
 
-        IEnumerable<Product> GetProducts(ProductsParameters productParameters);
+        PagedList<Product> GetProducts(ProductsParameters productParameters);
     }
 }

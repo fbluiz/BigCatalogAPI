@@ -4,6 +4,7 @@ using BigCatalogAPI.Models;
 using BigCatalogAPI.Pagination;
 using BigCatalogAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BigCatalogAPI.Controllers
 {
@@ -21,27 +22,39 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ProductDTO>> GetProducts([FromQuery] ProductsParameters productsParameters)
+        public <ActionResult<IEnumerable<ProductDTO>> GetProducts([FromQuery] ProductsParameters productsParameters)
         {
-            var products = _unitOfWork._productRepository.GetProducts(productsParameters).ToList();
-            
+            var products = _unitOfWork._productRepository.GetProducts(productsParameters);
+
+            var metadata = new
+            {
+                products.TotalCount,
+                products.PageSize,
+                products.CurrentPage,
+                products.HasNext,
+                products.HasPrevious,
+
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
             var productsDto = _mapper.Map<List<ProductDTO>>(products);
             return productsDto;
         }
 
         [HttpGet("lowprice")]
-        public ActionResult<IEnumerable<ProductDTO>> GetProductsByPrice() 
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsByPrice() 
         {
-            var productsForPrice = _unitOfWork._productRepository.GetProductForPrice().ToList();
+            var productsForPrice = await _unitOfWork._productRepository.GetProductForPrice();
             var productsDto = _mapper.Map<List<ProductDTO>>(productsForPrice);
 
             return productsDto;
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
-        public ActionResult<ProductDTO> Get(int id)
+        public async Task<ActionResult<ProductDTO>> Get(int id)
         {
-            var product = _unitOfWork._productRepository.GetById(p => p.ProductId == id);
+            var product = await _unitOfWork._productRepository.GetById(p => p.ProductId == id);
             
             if (product == null)
             {
@@ -53,7 +66,7 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody] ProductDTO productDto)
+        public async Task<ActionResult> Post([FromBody] ProductDTO productDto)
         {
             if (productDto is null)
                 return BadRequest();
@@ -61,7 +74,7 @@ namespace BigCatalogAPI.Controllers
             var product = _mapper.Map<Product>(productDto);
             
             _unitOfWork._productRepository.Add(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
 
             var productDTO = _mapper.Map<ProductDTO>(product);
             return new CreatedAtRouteResult("GetProductById",
@@ -69,7 +82,7 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<ProductDTO> Put(int id, [FromBody] ProductDTO productDTO)
+        public async Task<ActionResult<ProductDTO>> Put(int id, [FromBody] ProductDTO productDTO)
         {
             if (id != productDTO.ProductId)
             {
@@ -79,23 +92,23 @@ namespace BigCatalogAPI.Controllers
             var product = _mapper.Map<Product>(productDTO);
 
             _unitOfWork._productRepository.Update(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
 
             var productDto = _mapper.Map<ProductDTO>(product);
             return Ok(productDto);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult<ProductDTO> Delete(int id)
+        public async Task<ActionResult<ProductDTO>> Delete(int id)
         {
-            var product = _unitOfWork._productRepository.GetById(p => p.ProductId == id);
+            var product = await _unitOfWork._productRepository.GetById(p => p.ProductId == id);
             
             if (product is null)
             {
                 return NotFound("Product not found");
             }
             _unitOfWork._productRepository.Delete(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
 
             var productDto = _mapper.Map<ProductDTO>(product);
 

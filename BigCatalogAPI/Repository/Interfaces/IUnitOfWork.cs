@@ -7,6 +7,6 @@ namespace BigCatalogAPI.Repository.Interfaces
         IProductRepository _productRepository {get;}
         ICategoryRepository _categoryRepository {get;}
 
-        void Commit();
+        Task Commit();
     }
 }

@@ -12,9 +12,9 @@ namespace APICatalogo.Repository
         {
         }
 
-        public IEnumerable<Category> GetCategoryAndProduct()
+        public async Task<IEnumerable<Category>> GetCategoryAndProduct()
         {
-            return Get().Include(c => c.Products);
+            return await Get().Include(c => c.Products).ToListAsync();
         }
     }
 }

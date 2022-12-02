@@ -31,9 +31,9 @@ namespace BigCatalogAPI.Repository
             }
         }
 
-        public void Commit()
+        public async Task Commit()
         {
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
         public void Dispose()
