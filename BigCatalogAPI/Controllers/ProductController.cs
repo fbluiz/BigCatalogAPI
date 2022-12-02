@@ -22,9 +22,9 @@ namespace BigCatalogAPI.Controllers
         }
 
         [HttpGet]
-        public <ActionResult<IEnumerable<ProductDTO>> GetProducts([FromQuery] ProductsParameters productsParameters)
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts([FromQuery] ProductsParameters productsParameters)
         {
-            var products = _unitOfWork._productRepository.GetProducts(productsParameters);
+            var products = await _unitOfWork._productRepository.GetProducts(productsParameters);
 
             var metadata = new
             {
