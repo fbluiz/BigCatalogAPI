@@ -2,11 +2,13 @@
 using BigCatalogAPI.DTOs;
 using BigCatalogAPI.Models;
 using BigCatalogAPI.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BigCatalogAPI.Controllers
 {
+
     [Route("[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase

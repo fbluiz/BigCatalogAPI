@@ -4,15 +4,45 @@ using BigCatalogAPI.Context;
 using BigCatalogAPI.DTOs.Mappings;
 using BigCatalogAPI.Repository;
 using BigCatalogAPI.Repository.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol.Core.Types;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContext<NorthwindContext>(options => options.UseSqlServer
-    ("Server=DESKTOP-332I3M0\\SQLEXPRESS;Database=Northwind;Encrypt=False; Trusted_Connection=True;"));
+string SqlServerConnection= builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(SqlServerConnection));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<NorthwindContext>()
+    .AddDefaultTokenProviders();
+
+
+//JWT
+//adiciona o manipulador de autenticacao e define o 
+//esquema de autenticacao usado : Bearer
+//valida o emissor, a audiencia e a chave
+//usando a chave secreta valida a assinatura
+builder.Services.AddAuthentication(
+    JwtBearerDefaults.AuthenticationScheme).
+    AddJwtBearer(options =>
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+         ValidateIssuer = true,
+         ValidateAudience = true,
+         ValidateLifetime = true,
+         ValidAudience = builder.Configuration["TokenConfiguration:Audience"],
+         ValidIssuer = builder.Configuration["TokenConfiguration:Issuer"],
+         ValidateIssuerSigningKey = true,
+         IssuerSigningKey = new SymmetricSecurityKey(
+             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"]))
+     });
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -41,6 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

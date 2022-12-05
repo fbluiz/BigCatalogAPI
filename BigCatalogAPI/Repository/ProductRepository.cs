@@ -17,7 +17,7 @@ namespace BigCatalogAPI.Repository
             return await Get().OrderBy(c=>c.UnitPrice).ToListAsync();
         }
 
-        public PagedList<Product> GetProducts(ProductsParameters productParameters)
+        public async Task <PagedList<Product>> GetProducts(ProductsParameters productParameters)
         {
             //return Get()
             //   .OrderBy(c => c.ProductId)
@@ -25,7 +25,7 @@ namespace BigCatalogAPI.Repository
             //   .Take(productParameters.PageSize)
             //   .ToList();
 
-            return PagedList<Product>.ToPagedList(Get().OrderBy(on => on.ProductId),
+            return await PagedList<Product>.ToPagedList(Get().OrderBy(on => on.ProductId),
                 productParameters.PageNumber, productParameters.PageSize);
         }
     }

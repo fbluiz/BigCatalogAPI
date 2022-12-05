@@ -8,6 +8,6 @@ namespace BigCatalogAPI.Repository.Interfaces
     {
         Task<IEnumerable<Product>> GetProductForPrice();
 
-        PagedList<Product> GetProducts(ProductsParameters productParameters);
+        Task<PagedList<Product>> GetProducts(ProductsParameters productParameters);
     }
 }
