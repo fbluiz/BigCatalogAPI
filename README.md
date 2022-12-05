@@ -6,4 +6,6 @@
 4 - Paginação de dados <br>
 5 - Programação Assíncrona <br>
 6 - Identity (autenticação JWT) <br>
+7 - CRUD Completo 
+8 - Acesso a dados com EF Core
 <p/>
