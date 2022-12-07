@@ -2,7 +2,7 @@
 
 1 - DataBase First <br>
 2 - Padrão Repositório <br>
-3 - Padrão Unit Of Work <br>
+3 - Padrão Unit of Work <br>
 4 - Paginação de dados <br>
 5 - Programação Assíncrona <br>
 6 - Identity (autenticação JWT) <br>
